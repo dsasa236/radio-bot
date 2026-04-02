@@ -1,0 +1,38 @@
+{
+    "898386558531559495": {
+        "slots": [
+            {
+                "name": "เปาเปา",
+                "hp": 97,
+                "maxhp": 100,
+                "atk": 10,
+                "def": 5,
+                "spd": 3,
+                "lv": 1,
+                "exp": 20,
+                "gold": 10
+            },
+            null,
+            null
+        ]
+    },
+    "1376212114137415741": {
+        "slots": [
+            {
+                "name": "Golgaroth",
+                "hp": 100,
+                "maxhp": 100,
+                "atk": 10,
+                "def": 5,
+                "spd": 3,
+                "lv": 1,
+                "exp": 0,
+                "gold": 0,
+                "weapon": null,
+                "armor": null
+            },
+            null,
+            null
+        ]
+    }
+}
