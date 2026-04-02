@@ -1,18 +1,15 @@
 import discord
 from discord.ext import commands
 import json
-import os
 import random
 
 # ===== LOAD CONFIG =====
-try:
-    with open("config.json", "r", encoding="utf-8") as f:
-        config = json.load(f)
-        TOKEN = config.get("TOKEN")
-    if not TOKEN:
-        raise ValueError("TOKEN ไม่มีใน config.json")
-except Exception as e:
-    print(f"❌ โหลด config.json ไม่ได้: {e}")
+import os
+
+TOKEN = os.getenv("TOKEN")
+
+if not TOKEN:
+    print("❌ ไม่พบ TOKEN")
     exit()
 
 # ===== BOT SETUP =====
