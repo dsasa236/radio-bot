@@ -1,11 +1,13 @@
 import discord
 from discord.ext import commands
+import os
 import json
 import random
+from flask import Flask
+from threading import Thread
 
-# ===== LOAD CONFIG =====
-import os
 
+# ===== LOAD TOKEN =====
 TOKEN = os.getenv("TOKEN")
 
 if not TOKEN:
@@ -161,22 +163,21 @@ async def hunt(ctx, slot: int):
         log += f"💥 มอนตี {dmg} HP คุณเหลือ {max(char.get('hp',0),0)}\n"
 
     if char.get("hp",0) > 0:
-        char["exp"] = char.get("exp",0) + monster.get("exp",0)
-        char["gold"] = char.get("gold",0) + monster.get("gold",0)
-        log += f"\n🏆 ชนะ! +{monster.get('exp',0)} EXP +{monster.get('gold',0)} Gold\n"
+        char["exp"] += monster["exp"]
+        char["gold"] += monster["gold"]
+        log += f"\n🏆 ชนะ! +{monster['exp']} EXP +{monster['gold']} Gold\n"
 
         if random.random() < 0.4:
             item, t = drop_item()
             log += f"🎁 ดรอป: {item['name']}\n"
             char[t] = item
 
-        # LEVEL UP
-        while char.get("exp",0) >= 100:
+        while char["exp"] >= 100:
             char["exp"] -= 100
-            char["lv"] = char.get("lv",1)+1
-            char["maxhp"] = char.get("maxhp",100)+20
-            char["atk"] = char.get("atk",10)+3
-            char["def"] = char.get("def",5)+2
+            char["lv"] += 1
+            char["maxhp"] += 20
+            char["atk"] += 3
+            char["def"] += 2
             char["hp"] = char["maxhp"]
             log += f"✨ เลเวลอัพ! Lv.{char['lv']}\n"
     else:
@@ -185,26 +186,23 @@ async def hunt(ctx, slot: int):
 
     save_data(data)
 
-    chunks = [log[i:i+1000] for i in range(0, len(log), 1000)]
-    for chunk in chunks:
-        embed = discord.Embed(description=f"```{chunk}```", color=0xff9900)
-        await ctx.send(embed=embed)
+    for chunk in [log[i:i+1000] for i in range(0, len(log), 1000)]:
+        await ctx.send(embed=discord.Embed(description=f"```{chunk}```", color=0xff9900))
 
 # ===== HEAL =====
 @bot.command()
 async def heal(ctx, slot: int):
-    if slot < 1 or slot > 3:
-        return await ctx.send("❌ เลือก slot 1-3")
-
     user_id = str(ctx.author.id)
     data = load_data()
     char = data.get(user_id, {}).get("slots", [None,None,None])[slot-1]
+
     if not char:
         return await ctx.send("❌ ไม่มีตัวละคร")
 
-    char["hp"] = char.get("maxhp",100)
+    char["hp"] = char["maxhp"]
     save_data(data)
-    await ctx.send(f"💖 {char.get('name','ตัวละคร')} HP เต็ม!")
+    await ctx.send(f"💖 {char['name']} HP เต็ม!")
 
 # ===== RUN =====
+keep_alive()
 bot.run(TOKEN)
